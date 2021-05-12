@@ -1,23 +1,25 @@
-import logo from './logo.svg';
-import './App.scss';
+import React, { Suspense } from "react";
+import { Switch, BrowserRouter, Route, Redirect } from "react-router-dom";
+import "./App.scss";
+
+// Path
+const APP_HOME = "/";
+const APP_CALCULATOR = "/calculator";
+
+// Components
+const Calculator = React.lazy(() => import("./pages/Calculator"));
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Suspense fallback={<div>Loading...</div>}>
+        <BrowserRouter>
+          <Switch>
+            <Redirect exact from={APP_HOME} to={APP_CALCULATOR} />
+            <Route path={APP_CALCULATOR} component={Calculator} />
+          </Switch>
+        </BrowserRouter>
+      </Suspense>
     </div>
   );
 }

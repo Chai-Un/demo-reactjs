@@ -1,0 +1,41 @@
+@mixin fontColor($fontSize, $color) {
+  font-size: $fontSize;
+  color: $color;
+}
+
+.main {
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.cal-form {
+  &__field {
+    display: flex;
+    padding: 15px 0;
+
+    label {
+      width: 150px;
+      @include fontColor(20px, #333);
+    }
+
+    select,
+    input {
+      width: 150px;
+      padding: 4px 0;
+    }
+
+    .location {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      &-item {
+        width: 75px;
+      }
+    }
+  }
+
+  .btn {
+    padding: 5px 15px;
+  }
+}
