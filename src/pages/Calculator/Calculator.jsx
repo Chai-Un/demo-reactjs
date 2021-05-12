@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import Location from "./components/Location";
+import MapModal from "./components/MapModal/MapModal.jsx";
 import { addToCard, getLocations, getProducts } from "../../services/calculator-service";
 import { customDate, getNumberKey } from "../../utils/date";
+import { IconButton } from "@material-ui/core";
+import CloseIcon from "@material-ui/icons/Close";
 import "./Calculator.scss";
 
 // requirement (do not need to do ADD LOCATION), so i'm assigned location with id = 4
@@ -15,6 +17,7 @@ const Calculator = () => {
   const [product, setProduct] = useState("");
   const [units, setUnits] = useState(0);
   const [price, setPrice] = useState(0);
+  const [open, setOpen] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -125,6 +128,15 @@ const Calculator = () => {
 
   const resetDate = () => setDate("");
 
+  const showModal = (e) => {
+    e.preventDefault();
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
   useEffect(() => {
     handleGetProducts();
     handleGetLocations();
@@ -134,6 +146,7 @@ const Calculator = () => {
 
   return (
     <main className="main">
+      <MapModal open={open} onClose={onClose} />
       <header className="header">Calculator</header>
       <div className="cal-form">
         <form onSubmit={handleSubmit}>
@@ -155,8 +168,43 @@ const Calculator = () => {
             <input type="date" value={date} min={min} max={max} name="date" id="date" onChange={handleDate} />
           </div>
           <div className="cal-form__field">
-            <Location place={locations[3]} units={units} cost={units * price} />
+            <label>Locations</label>
+            <div className="location">
+              <div className="location-item">
+                <label>Place</label>
+              </div>
+              <div className="location-item">
+                <label>Units</label>
+              </div>
+              <div className="location-item">
+                <label>Cost</label>
+              </div>
+              <div className="location-item">
+                <button onClick={showModal}>Add</button>
+              </div>
+            </div>
           </div>
+
+          <div className="cal-form__field">
+            <label></label>
+            <div className="location">
+              <div className="location-item">
+                <label>Asoke</label>
+              </div>
+              <div className="location-item">
+                <label>2000</label>
+              </div>
+              <div className="location-item">
+                <label>5000</label>
+              </div>
+              <div className="location-item">
+                <IconButton className="button-delete">
+                  <CloseIcon />
+                </IconButton>
+              </div>
+            </div>
+          </div>
+
           <div className="cal-form__field">
             <label>Total Units</label>
             <div>{units}</div>

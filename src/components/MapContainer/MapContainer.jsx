@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { GoogleMap, useLoadScript, Marker, InfoWindow } from "@react-google-maps/api";
 import { getLocations } from "../../services/calculator-service";
+import "./MapContainer.scss";
 
 const libraries = ["places"];
 const mapContainerStyle = {
@@ -16,7 +17,7 @@ const center = {
   lng: 100.5498083
 };
 
-export default function MapContainer() {
+const MapContainer = () => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: "AIzaSyC0JsHIttDgHoVilzwQ0CPjGdhFgSYf2n0",
     libraries
@@ -39,7 +40,8 @@ export default function MapContainer() {
           lat: e.lat,
           lng: e.long,
           max_dist: e.max_dist,
-          name: e.name
+          name: e.name,
+          fee: e.fee
         });
       });
       setMarkers(listMarkers);
@@ -95,10 +97,18 @@ export default function MapContainer() {
               <div>
                 Max units: <span>{selected.max_dist}</span>
               </div>
+              <div>
+                Fee: <span>{selected.fee}</span>
+              </div>
+              <div className="button-add">
+                <button>Add</button>
+              </div>
             </div>
           </InfoWindow>
         ) : null}
       </GoogleMap>
     </div>
   );
-}
+};
+
+export default MapContainer;
