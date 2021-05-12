@@ -7,14 +7,14 @@ import "./Calculator.scss";
 // requirement (do not need to do ADD LOCATION), so i'm assigned location with id = 4
 
 const Calculator = () => {
-  const [ loading, setLoading ] = useState(false);
-  const [ isSubmit, setIsSubmit ] = useState(false);
-  const [ products, setProducts ] = useState([]);
-  const [ locations, setLocations ] = useState([]);
-  const [ date, setDate ] = useState("");
-  const [ product, setProduct ] = useState("");
-  const [ units, setUnits ] = useState(0);
-  const [ price, setPrice ] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [isSubmit, setIsSubmit] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [date, setDate] = useState("");
+  const [product, setProduct] = useState("");
+  const [units, setUnits] = useState(0);
+  const [price, setPrice] = useState(0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,7 +90,7 @@ const Calculator = () => {
     const numberKey = getNumberKey(target.value);
 
     if (numberKey && numberKey > 0) {
-      const objMaxPro = products.filter((p) => p.id === product)[ 0 ];
+      const objMaxPro = products.filter((p) => p.id === product)[0];
       const units = handleMaxPro(objMaxPro.max_production, numberKey);
       console.log(units);
       handleLocationUnit(units, target.value);
@@ -100,17 +100,17 @@ const Calculator = () => {
 
   // If the number of days in the future the user has picked is greater than the largest days key then use the largest key
   const handleMaxPro = (maxPro, key) => {
-    if (!maxPro[ key ]) {
-      const lastItem = Object.keys(maxPro)[ Object.keys(maxPro).length - 1 ];
-      return maxPro[ lastItem ];
+    if (!maxPro[key]) {
+      const lastItem = Object.keys(maxPro)[Object.keys(maxPro).length - 1];
+      return maxPro[lastItem];
     }
 
-    return maxPro[ key ];
+    return maxPro[key];
   };
 
   // Also the total sum of all location units cannot be larger than the available production for that date and product
   const handleLocationUnit = (units, date) => {
-    const maxDist = locations[ 3 ].max_dist;
+    const maxDist = locations[3].max_dist;
     console.log(maxDist, "max_dist");
 
     if (units > maxDist) {
@@ -140,7 +140,7 @@ const Calculator = () => {
           <div className="cal-form__field">
             <label>Product</label>
             <select name="product" onChange={handleProduct}>
-              <option value="">choose</option>
+              <option value="">Products</option>
               {products.map((p) => {
                 return (
                   <option key={p.id} value={p.id}>
@@ -155,7 +155,7 @@ const Calculator = () => {
             <input type="date" value={date} min={min} max={max} name="date" id="date" onChange={handleDate} />
           </div>
           <div className="cal-form__field">
-            <Location place={locations[ 3 ]} units={units} cost={units * price} />
+            <Location place={locations[3]} units={units} cost={units * price} />
           </div>
           <div className="cal-form__field">
             <label>Total Units</label>
