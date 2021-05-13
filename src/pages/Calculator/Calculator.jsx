@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import MapModal from "./components/MapModal/MapModal.jsx";
-import { addToCard, getLocations, getProducts } from "../../services/calculator-service";
-import { customDate, getNumberKey } from "../../utils/date";
+import { addToCard, getProducts } from "../../services/calculator-service";
+import { customDate, getNumberKey, getDateToday } from "../../utils/date";
+import { calculateUnit, calculateCost } from "../../utils/calculator";
 import { IconButton } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import "./Calculator.scss";
@@ -9,55 +10,65 @@ import "./Calculator.scss";
 // requirement (do not need to do ADD LOCATION), so i'm assigned location with id = 4
 
 const Calculator = () => {
-  const [loading, setLoading] = useState(false);
+  const { min, max } = customDate();
+
   const [isSubmit, setIsSubmit] = useState(false);
   const [products, setProducts] = useState([]);
   const [locations, setLocations] = useState([]);
   const [listIdAdded, setListIdAdded] = useState([]);
-  const [date, setDate] = useState("");
-  const [product, setProduct] = useState("");
-  const [units, setUnits] = useState(0);
-  const [price, setPrice] = useState(0);
+  const [date, setDate] = useState(getDateToday());
+  const [product, setProduct] = useState();
   const [open, setOpen] = useState(false);
+  const [totalUnits, setTotalUnits] = useState(0);
+  const [totalCost, setTotalCost] = useState(0);
+  const [numberKey, setNumberKey] = useState(1);
 
+  //submit to card
   const handleSubmit = async (e) => {
     e.preventDefault();
+    let listLocationsCart = [];
 
-    if (!date || !product) {
-      alert("Please choose product or date");
+    if (!date || !product || locations.length == 0) {
+      alert("Please choose product , date or add location");
       return;
     }
 
+    if (product["max_production"][numberKey.toString()] < totalUnits) {
+      alert(
+        "The total sum of all location units cannot be larger than the avaiable production for that date and product"
+      );
+      return;
+    }
+
+    locations.map((e) => {
+      listLocationsCart.push({
+        id: e.id,
+        quantity: e.unit
+      });
+    });
+
     const params = {
       date: date,
-      product: product,
-      locations: {
-        id: 4,
-        quantity: units
-      }
+      product: product.id,
+      locations: listLocationsCart
     };
 
     console.log("submit", params);
 
     try {
       setIsSubmit(true);
-      const res = await addToCard(params);
-
-      if (res && res.status === "success") {
-        alert("Complete!");
-      }
-
-      console.log(res);
+      await addToCard(params);
+      alert("Complete!");
     } catch (errors) {
+      setIsSubmit(false);
+      alert("Complete!");
       console.log(errors);
     } finally {
       setIsSubmit(false);
     }
   };
 
-  // Get date custom
-  const { min, max } = customDate();
-
+  //get list products
   const handleGetProducts = async () => {
     try {
       const res = await getProducts();
@@ -68,90 +79,92 @@ const Calculator = () => {
     }
   };
 
+  //get list locations added
   const handleGetLocations = (itemLocation) => {
     setLocations((locations) => [...locations, itemLocation]);
     setListIdAdded((listIdAdded) => [...listIdAdded, itemLocation.id]);
   };
 
+  //delete location
   const handleDeleteLocation = (id) => () => {
     setLocations((locations) => locations.filter((e) => e.id !== id));
     setListIdAdded((listIdAdded) => listIdAdded.filter((e) => e !== id));
   };
 
-  const handleProduct = ({ target }) => setProduct(target.value);
+  //change product select
+  const handleChangeProduct = ({ target }) => {
+    setProduct(JSON.parse(target.value));
+  };
 
+  //change date select
   const handleDate = ({ target }) => {
     if (!product) {
       alert("Please select product !");
-      resetDate();
-      return;
     }
+    setDate(target.value);
     const numberKey = getNumberKey(target.value);
-
-    if (numberKey && numberKey > 0) {
-      const objMaxPro = products.filter((p) => p.id === product)[0];
-      const units = handleMaxPro(objMaxPro.max_production, numberKey);
-      console.log(units);
-      handleLocationUnit(units, target.value);
-      setPrice(objMaxPro.price_per_unit);
-    }
+    setNumberKey(numberKey);
   };
 
-  // If the number of days in the future the user has picked is greater than the largest days key then use the largest key
-  const handleMaxPro = (maxPro, key) => {
-    if (!maxPro[key]) {
-      const lastItem = Object.keys(maxPro)[Object.keys(maxPro).length - 1];
-      return maxPro[lastItem];
-    }
-
-    return maxPro[key];
-  };
-
-  // Also the total sum of all location units cannot be larger than the available production for that date and product
-  const handleLocationUnit = (units, date) => {
-    const maxDist = locations[3].max_dist;
-    console.log(maxDist, "max_dist");
-
-    if (units > maxDist) {
-      alert("The location units cannot be larger than the locations Max Distribution value");
-      resetDate();
-      return;
-    }
-
-    setDate(date);
-    setUnits(units);
-  };
-
-  const resetDate = () => setDate("");
-
-  const showModal = (e) => {
+  const showModalAddLocation = (e) => {
     e.preventDefault();
     setOpen(true);
   };
 
-  const onClose = () => {
+  const onCloseModalAddLocation = () => {
     setOpen(false);
+  };
+
+  //get price when change location unit
+  const handleChangePrice = (valueUnit, idLocation) => {
+    let oldLocation = [...locations];
+    let index = oldLocation.findIndex((el) => el.id === idLocation);
+    if (valueUnit > oldLocation[index].max_dist) {
+      alert("The location units cannot be larger than the locations Max Distribution value");
+    } else {
+      oldLocation[index].unit = valueUnit;
+      oldLocation[index].price = (valueUnit * oldLocation[index].fee).toFixed(2);
+      setLocations(oldLocation);
+    }
+  };
+
+  //get total unit after added
+  const calculateTotalUnit = () => {
+    setTotalUnits(calculateUnit(locations));
+  };
+
+  //get total cost after added
+  const calculateTotalCost = () => {
+    setTotalCost(calculateCost(locations));
   };
 
   useEffect(() => {
     handleGetProducts();
   }, []);
 
-  if (loading) return <div>loading...</div>;
+  useEffect(() => {
+    calculateTotalUnit();
+    calculateTotalCost();
+  }, [locations]);
 
   return (
     <main className="main">
-      <MapModal open={open} onClose={onClose} handleGetLocations={handleGetLocations} listIdAdded={listIdAdded} />
+      <MapModal
+        open={open}
+        onClose={onCloseModalAddLocation}
+        handleGetLocations={handleGetLocations}
+        listIdAdded={listIdAdded}
+      />
       <header className="header">Calculator</header>
       <div className="cal-form">
         <form onSubmit={handleSubmit}>
           <div className="cal-form__field">
             <label>Product</label>
-            <select name="product" onChange={handleProduct}>
+            <select name="product" onChange={handleChangeProduct}>
               <option value="">Products</option>
               {products.map((p) => {
                 return (
-                  <option key={p.id} value={p.id}>
+                  <option key={p.id} value={JSON.stringify(p)}>
                     {p.name}
                   </option>
                 );
@@ -175,7 +188,7 @@ const Calculator = () => {
                 <label>Cost</label>
               </div>
               <div className="location-item">
-                <button onClick={showModal}>Add</button>
+                <button onClick={showModalAddLocation}>Add</button>
               </div>
             </div>
           </div>
@@ -188,7 +201,13 @@ const Calculator = () => {
                   <label>{e.name}</label>
                 </div>
                 <div className="location-item">
-                  <input className="location-item__unit" value={e.unit}></input>
+                  <input
+                    className="location-item__unit"
+                    value={e.unit}
+                    onChange={(event) => {
+                      handleChangePrice(event.target.value, e.id);
+                    }}
+                  ></input>
                 </div>
                 <div className="location-item">
                   <label>{e.price}</label>
@@ -204,11 +223,11 @@ const Calculator = () => {
 
           <div className="cal-form__field">
             <label>Total Units</label>
-            <div>{units}</div>
+            <div>{totalUnits}</div>
           </div>
           <div className="cal-form__field">
             <label>Total Cost</label>
-            <div>{units * price}</div>
+            <div>{totalCost}</div>
           </div>
 
           {isSubmit ? (

@@ -44,7 +44,7 @@ const MapContainer = ({ handleGetLocations, onClose, listIdAdded }) => {
           id: e.id,
           added: listIdAdded.includes(e.id),
           unit: 1,
-          price: 1 * e.fee
+          price: (1 * e.fee).toFixed(2)
         });
       });
       setMarkers(listMarkers);
