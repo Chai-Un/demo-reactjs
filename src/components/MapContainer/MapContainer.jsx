@@ -30,31 +30,6 @@ const MapContainer = ({ handleGetLocations, onClose, listIdAdded }) => {
     mapRef.current = map;
   }, []);
 
-  const getListLocations = useCallback(async () => {
-    try {
-      const listMarkers = [];
-      const res = await getLocations();
-      res.map((e) => {
-        listMarkers.push({
-          lat: e.lat,
-          lng: e.long,
-          max_dist: e.max_dist,
-          name: e.name,
-          fee: e.fee,
-          id: e.id,
-          added: listIdAdded.includes(e.id),
-          unit: 1,
-          price: (1 * e.fee).toFixed(2)
-        });
-      });
-      setMarkers(listMarkers);
-    } catch (errors) {
-      console.log(errors);
-    } finally {
-      // setLoading(false);
-    }
-  }, []);
-
   const markerClick = (point) => () => {
     setSelected(point);
   };
@@ -65,8 +40,32 @@ const MapContainer = ({ handleGetLocations, onClose, listIdAdded }) => {
   };
 
   useEffect(() => {
+    const getListLocations = async () => {
+      try {
+        const listMarkers = [];
+        const res = await getLocations();
+        res.forEach((e) => {
+          listMarkers.push({
+            lat: e.lat,
+            lng: e.long,
+            max_dist: e.max_dist,
+            name: e.name,
+            fee: e.fee,
+            id: e.id,
+            added: listIdAdded.includes(e.id),
+            unit: 1,
+            price: (1 * e.fee).toFixed(2)
+          });
+        });
+        setMarkers(listMarkers);
+      } catch (errors) {
+        console.log(errors);
+      } finally {
+      }
+    };
+
     getListLocations();
-  }, []);
+  }, [listIdAdded]);
 
   if (loadError) return "Error";
   if (!isLoaded) return "Loading...";

@@ -1,6 +1,6 @@
 export const calculateUnit = (locations) => {
   let calTotalUnits = 0;
-  locations.map((e) => {
+  locations.forEach((e) => {
     calTotalUnits = Number(calTotalUnits) + Number(e.unit);
   });
   return calTotalUnits;
@@ -8,8 +8,8 @@ export const calculateUnit = (locations) => {
 
 export const calculateCost = (locations) => {
   let calTotalCost = 0;
-  locations.map((e) => {
+  locations.forEach((e) => {
     calTotalCost = Number(calTotalCost) + Number(e.price);
   });
-  return calTotalCost;
+  return calTotalCost.toFixed(2);
 };

@@ -23,5 +23,5 @@ export const getNumberKey = (date) => {
   const d = new Date();
   const currentDate = dateByVal(d);
   const dateByChoose = dateByVal(date);
-  return dateByChoose - currentDate > 3 ? 3 : dateByChoose - currentDate;
+  return dateByChoose - currentDate;
 };
