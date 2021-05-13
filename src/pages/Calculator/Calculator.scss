@@ -31,6 +31,9 @@
       flex-wrap: wrap;
       &-item {
         width: 75px;
+        &__unit {
+          width: 50%;
+        }
       }
     }
   }

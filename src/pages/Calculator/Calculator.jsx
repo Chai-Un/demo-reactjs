@@ -13,6 +13,7 @@ const Calculator = () => {
   const [isSubmit, setIsSubmit] = useState(false);
   const [products, setProducts] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [listIdAdded, setListIdAdded] = useState([]);
   const [date, setDate] = useState("");
   const [product, setProduct] = useState("");
   const [units, setUnits] = useState(0);
@@ -60,26 +61,21 @@ const Calculator = () => {
   const handleGetProducts = async () => {
     try {
       const res = await getProducts();
-      console.log(res);
       setProducts(res);
     } catch (errors) {
       console.log(errors);
     } finally {
-      console.log("finally");
     }
   };
 
-  const handleGetLocations = async () => {
-    try {
-      setLoading(true);
-      const res = await getLocations();
-      console.log(res);
-      setLocations(res);
-    } catch (errors) {
-      console.log(errors);
-    } finally {
-      setLoading(false);
-    }
+  const handleGetLocations = (itemLocation) => {
+    setLocations((locations) => [...locations, itemLocation]);
+    setListIdAdded((listIdAdded) => [...listIdAdded, itemLocation.id]);
+  };
+
+  const handleDeleteLocation = (id) => () => {
+    setLocations((locations) => locations.filter((e) => e.id !== id));
+    setListIdAdded((listIdAdded) => listIdAdded.filter((e) => e !== id));
   };
 
   const handleProduct = ({ target }) => setProduct(target.value);
@@ -139,14 +135,13 @@ const Calculator = () => {
 
   useEffect(() => {
     handleGetProducts();
-    handleGetLocations();
   }, []);
 
   if (loading) return <div>loading...</div>;
 
   return (
     <main className="main">
-      <MapModal open={open} onClose={onClose} />
+      <MapModal open={open} onClose={onClose} handleGetLocations={handleGetLocations} listIdAdded={listIdAdded} />
       <header className="header">Calculator</header>
       <div className="cal-form">
         <form onSubmit={handleSubmit}>
@@ -185,25 +180,27 @@ const Calculator = () => {
             </div>
           </div>
 
-          <div className="cal-form__field">
-            <label></label>
-            <div className="location">
-              <div className="location-item">
-                <label>Asoke</label>
-              </div>
-              <div className="location-item">
-                <label>2000</label>
-              </div>
-              <div className="location-item">
-                <label>5000</label>
-              </div>
-              <div className="location-item">
-                <IconButton className="button-delete">
-                  <CloseIcon />
-                </IconButton>
+          {locations.map((e) => (
+            <div className="cal-form__field" key={e.id}>
+              <label></label>
+              <div className="location">
+                <div className="location-item">
+                  <label>{e.name}</label>
+                </div>
+                <div className="location-item">
+                  <input className="location-item__unit" value={e.unit}></input>
+                </div>
+                <div className="location-item">
+                  <label>{e.price}</label>
+                </div>
+                <div className="location-item">
+                  <IconButton onClick={handleDeleteLocation(e.id)} className="button-delete">
+                    <CloseIcon />
+                  </IconButton>
+                </div>
               </div>
             </div>
-          </div>
+          ))}
 
           <div className="cal-form__field">
             <label>Total Units</label>

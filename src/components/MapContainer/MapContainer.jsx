@@ -17,7 +17,7 @@ const center = {
   lng: 100.5498083
 };
 
-const MapContainer = () => {
+const MapContainer = ({ handleGetLocations, onClose, listIdAdded }) => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: "AIzaSyC0JsHIttDgHoVilzwQ0CPjGdhFgSYf2n0",
     libraries
@@ -34,14 +34,17 @@ const MapContainer = () => {
     try {
       const listMarkers = [];
       const res = await getLocations();
-      console.log(res);
       res.map((e) => {
         listMarkers.push({
           lat: e.lat,
           lng: e.long,
           max_dist: e.max_dist,
           name: e.name,
-          fee: e.fee
+          fee: e.fee,
+          id: e.id,
+          added: listIdAdded.includes(e.id),
+          unit: 1,
+          price: 1 * e.fee
         });
       });
       setMarkers(listMarkers);
@@ -51,6 +54,15 @@ const MapContainer = () => {
       // setLoading(false);
     }
   }, []);
+
+  const markerClick = (point) => () => {
+    setSelected(point);
+  };
+
+  const addLocation = () => {
+    handleGetLocations(selected);
+    onClose();
+  };
 
   useEffect(() => {
     getListLocations();
@@ -73,9 +85,7 @@ const MapContainer = () => {
           <Marker
             key={`${marker.lat}-${marker.lng}`}
             position={{ lat: marker.lat, lng: marker.lng }}
-            onClick={() => {
-              setSelected(marker);
-            }}
+            onClick={markerClick(marker)}
             icon={{
               url: "https://www.clubphysical.co.nz/wp-content/uploads/2016/11/google-maps-hi.png",
               origin: new window.google.maps.Point(0, 0),
@@ -101,7 +111,9 @@ const MapContainer = () => {
                 Fee: <span>{selected.fee}</span>
               </div>
               <div className="button-add">
-                <button>Add</button>
+                <button onClick={addLocation} disabled={selected.added}>
+                  Add
+                </button>
               </div>
             </div>
           </InfoWindow>
