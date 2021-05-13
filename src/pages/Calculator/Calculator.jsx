@@ -174,7 +174,7 @@ const Calculator = () => {
             <label className="cal-form--bold">Date</label>
             <input type="date" value={date} min={min} max={max} name="date" id="date" onChange={handleDate} />
           </div>
-          <div className="cal-form__field cal-form--bold">
+          <div className="cal-form__field cal-form--bold locations">
             <label>Locations</label>
             <div className="location">
               <div className="location-item">
@@ -195,7 +195,7 @@ const Calculator = () => {
           </div>
 
           {locations.map((e) => (
-            <div className="cal-form__field" key={e.id}>
+            <div className="cal-form__field locations" key={e.id}>
               <label></label>
               <div className="location">
                 <div className="location-item">
