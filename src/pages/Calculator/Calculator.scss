@@ -3,40 +3,42 @@
   color: $color;
 }
 
-.main {
-  border: 1px solid;
-  border-radius: 10px;
-  padding: 35px;
-  width: 50vw;
-}
-
 .header {
   font-size: 25px;
+  padding: 15px 0;
+}
+
+.locations {
+  display: block;
 }
 
 .cal-form {
   &__field {
-    display: flex;
     padding: 15px 0;
 
     label {
       width: 150px;
-      @include fontColor(20px, #333);
+      @include fontColor(16px, #333);
     }
 
     select,
     input {
       width: 250px;
       padding: 4px 0;
+      margin-top: 5px;
       font-size: 15px;
+      display: block;
     }
 
     .location {
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
+
       &-item {
-        width: 150px;
+        width: 90px;
+        line-height: 48px;
+
         &__unit {
           width: 50%;
         }
@@ -55,9 +57,49 @@
   .btn {
     padding: 5px 15px;
     margin-left: 150px;
+    margin-top: 15px;
   }
 }
 
 .button-delete {
-  padding-top: 2px !important;
+  color: #000;
+
+  &:hover {
+    background-color: #ff0000cc !important;
+    color: #fff;
+    cursor: pointer;
+  }
+}
+
+@media only screen and (min-width: 576px) {
+  .cal-form {
+    &__field:not(.locations) {
+      display: flex;
+
+      select,
+      input {
+        margin-top: 0;
+      }
+    }
+
+    &-item {
+      width: 115px;
+    }
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .locations {
+    display: flex;
+  }
+
+  .cal-form {
+    .location {
+      padding: 0;
+
+      &-item {
+        width: 110px;
+      }
+    }
+  }
 }

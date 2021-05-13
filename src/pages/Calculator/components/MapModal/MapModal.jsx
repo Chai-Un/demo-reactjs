@@ -9,7 +9,7 @@ const MapModal = ({ open, onClose, handleGetLocations, listIdAdded }) => {
       <Modal
         open={open}
         onClose={onClose}
-        BackdropProps={{ style: { background: "white", opacity: 0.8, backdropFilter: "blur(8px)" } }}
+        BackdropProps={{ style: { background: "#f2f2f2" } }}
         className="modal-map"
       >
         <div className="map-container">

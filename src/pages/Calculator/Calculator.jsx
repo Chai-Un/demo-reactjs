@@ -7,12 +7,9 @@ import { IconButton, Button } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import "./Calculator.scss";
 
-// requirement (do not need to do ADD LOCATION), so i'm assigned location with id = 4
-
 const Calculator = () => {
   const { min, max } = customDate();
 
-  const [isSubmit, setIsSubmit] = useState(false);
   const [products, setProducts] = useState([]);
   const [locations, setLocations] = useState([]);
   const [listIdAdded, setListIdAdded] = useState([]);
@@ -28,19 +25,21 @@ const Calculator = () => {
     e.preventDefault();
     let listLocationsCart = [];
 
-    if (!date || !product || locations.length == 0) {
+    if (!date || !product || locations.length === 0) {
       alert("Please choose product , date or add location");
       return;
     }
 
     if (product["max_production"][numberKey.toString()] < totalUnits) {
       alert(
-        "The total sum of all location units cannot be larger than the avaiable production for that date and product"
+        `The total sum of all location units cannot be larger than ${
+          product["max_production"][numberKey.toString()]
+        } for that date and product`
       );
       return;
     }
 
-    locations.map((e) => {
+    locations.forEach((e) => {
       listLocationsCart.push({
         id: e.id,
         quantity: e.unit
@@ -56,14 +55,15 @@ const Calculator = () => {
     console.log("submit", params);
 
     try {
-      setIsSubmit(true);
       await addToCard(params);
     } catch (errors) {
-      setIsSubmit(false);
       console.log(errors);
+      setLocations([]);
+      setListIdAdded([]);
     } finally {
-      setIsSubmit(false);
       alert("Complete!");
+      setLocations([]);
+      setListIdAdded([]);
     }
   };
 
@@ -99,10 +99,14 @@ const Calculator = () => {
   const handleDate = ({ target }) => {
     if (!product) {
       alert("Please select product !");
+      return;
     }
     setDate(target.value);
-    const numberKey = getNumberKey(target.value);
-    setNumberKey(numberKey);
+    let numberKeyResponse =
+      getNumberKey(target.value) > Object.keys(product["max_production"]).length
+        ? Object.keys(product["max_production"]).length
+        : getNumberKey(target.value);
+    setNumberKey(numberKeyResponse);
   };
 
   const showModalAddLocation = (e) => {
@@ -119,7 +123,7 @@ const Calculator = () => {
     let oldLocation = [...locations];
     let index = oldLocation.findIndex((el) => el.id === idLocation);
     if (valueUnit > oldLocation[index].max_dist) {
-      alert("The location units cannot be larger than the locations Max Distribution value");
+      alert(`The location units cannot be larger than the max distribution value ${oldLocation[index].max_dist}`);
     } else {
       oldLocation[index].unit = valueUnit;
       oldLocation[index].price = (valueUnit * oldLocation[index].fee).toFixed(2);
@@ -127,21 +131,19 @@ const Calculator = () => {
     }
   };
 
-  //get total unit after added
-  const calculateTotalUnit = () => {
-    setTotalUnits(calculateUnit(locations));
-  };
-
-  //get total cost after added
-  const calculateTotalCost = () => {
-    setTotalCost(calculateCost(locations));
-  };
-
   useEffect(() => {
     handleGetProducts();
   }, []);
 
   useEffect(() => {
+    const calculateTotalUnit = () => {
+      setTotalUnits(calculateUnit(locations));
+    };
+
+    const calculateTotalCost = () => {
+      setTotalCost(calculateCost(locations));
+    };
+
     calculateTotalUnit();
     calculateTotalCost();
   }, [locations]);
@@ -174,7 +176,7 @@ const Calculator = () => {
             <label className="cal-form--bold">Date</label>
             <input type="date" value={date} min={min} max={max} name="date" id="date" onChange={handleDate} />
           </div>
-          <div className="cal-form__field cal-form--bold">
+          <div className="cal-form__field cal-form--bold locations">
             <label>Locations</label>
             <div className="location">
               <div className="location-item">
@@ -195,7 +197,7 @@ const Calculator = () => {
           </div>
 
           {locations.map((e) => (
-            <div className="cal-form__field" key={e.id}>
+            <div className="cal-form__field locations" key={e.id}>
               <label></label>
               <div className="location">
                 <div className="location-item">
