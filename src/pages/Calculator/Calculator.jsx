@@ -3,7 +3,7 @@ import MapModal from "./components/MapModal/MapModal.jsx";
 import { addToCard, getProducts } from "../../services/calculator-service";
 import { customDate, getNumberKey, getDateToday } from "../../utils/date";
 import { calculateUnit, calculateCost } from "../../utils/calculator";
-import { IconButton } from "@material-ui/core";
+import { IconButton, Button } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import "./Calculator.scss";
 
@@ -58,13 +58,12 @@ const Calculator = () => {
     try {
       setIsSubmit(true);
       await addToCard(params);
-      alert("Complete!");
     } catch (errors) {
       setIsSubmit(false);
-      alert("Complete!");
       console.log(errors);
     } finally {
       setIsSubmit(false);
+      alert("Complete!");
     }
   };
 
@@ -159,7 +158,7 @@ const Calculator = () => {
       <div className="cal-form">
         <form onSubmit={handleSubmit}>
           <div className="cal-form__field">
-            <label>Product</label>
+            <label className="cal-form--bold">Product</label>
             <select name="product" onChange={handleChangeProduct}>
               <option value="">Products</option>
               {products.map((p) => {
@@ -172,10 +171,10 @@ const Calculator = () => {
             </select>
           </div>
           <div className="cal-form__field">
-            <label>Date</label>
+            <label className="cal-form--bold">Date</label>
             <input type="date" value={date} min={min} max={max} name="date" id="date" onChange={handleDate} />
           </div>
-          <div className="cal-form__field">
+          <div className="cal-form__field cal-form--bold">
             <label>Locations</label>
             <div className="location">
               <div className="location-item">
@@ -188,7 +187,9 @@ const Calculator = () => {
                 <label>Cost</label>
               </div>
               <div className="location-item">
-                <button onClick={showModalAddLocation}>Add</button>
+                <Button onClick={showModalAddLocation} variant="contained" color="secondary">
+                  Add
+                </Button>
               </div>
             </div>
           </div>
@@ -221,22 +222,17 @@ const Calculator = () => {
             </div>
           ))}
 
-          <div className="cal-form__field">
+          <div className="cal-form__field cal-form--bold">
             <label>Total Units</label>
-            <div>{totalUnits}</div>
+            <div className="cal-form__total">{totalUnits}</div>
           </div>
-          <div className="cal-form__field">
+          <div className="cal-form__field cal-form--bold">
             <label>Total Cost</label>
-            <div>{totalCost}</div>
+            <div className="cal-form__total">{totalCost}</div>
           </div>
-
-          {isSubmit ? (
-            <div>Loading...</div>
-          ) : (
-            <button type="submit" className="btn">
-              Submit
-            </button>
-          )}
+          <Button type="submit" variant="contained" color="primary" className="btn">
+            Submit
+          </Button>
         </form>
       </div>
     </main>
