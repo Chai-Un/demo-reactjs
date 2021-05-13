@@ -6,7 +6,12 @@
 .main {
   border: 1px solid;
   border-radius: 10px;
-  padding: 15px;
+  padding: 35px;
+  width: 50vw;
+}
+
+.header {
+  font-size: 25px;
 }
 
 .cal-form {
@@ -21,8 +26,9 @@
 
     select,
     input {
-      width: 150px;
+      width: 250px;
       padding: 4px 0;
+      font-size: 15px;
     }
 
     .location {
@@ -30,12 +36,28 @@
       flex-direction: row;
       flex-wrap: wrap;
       &-item {
-        width: 75px;
+        width: 150px;
+        &__unit {
+          width: 50%;
+        }
       }
     }
   }
 
+  &--bold {
+    font-weight: bold;
+  }
+
+  &__total {
+    padding-top: 4px;
+  }
+
   .btn {
     padding: 5px 15px;
+    margin-left: 150px;
   }
+}
+
+.button-delete {
+  padding-top: 2px !important;
 }
